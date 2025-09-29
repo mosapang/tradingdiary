@@ -1,61 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Trading Diary - Add Trade</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <h1>Add New Trade</h1>
-  <form id="tradeForm">
-    <label>Date: <input type="date" name="date" required></label><br>
-    <label>Symbol: <input type="text" name="symbol" required></label><br>
-    <label>Pattern Name: <input type="text" name="patternName" required></label><br>
-    <label>Pattern Condition: <textarea name="patternCondition" required></textarea></label><br>
-    <label>Strategy: 
-      <select name="strategy" required>
-        <option value="Breakout">Breakout</option>
-        <option value="Pullback">Pullback</option>
-        <option value="Reversal">Reversal</option>
-        <option value="Momentum">Momentum</option>
-        <option value="Scalping">Scalping</option>
-        <option value="Swing Trading">Swing Trading</option>
-        <option value="Position Trading">Position Trading</option>
-      </select>
-    </label><br>
-    <label>Entry: <input type="number" name="entry" step="0.01" required></label><br>
-    <label>Stop Loss: <input type="number" name="stopLoss" step="0.01" required></label><br>
-    <label>Target: <input type="number" name="target" step="0.01" required></label><br>
-    <label>Exit: <input type="number" name="exit" step="0.01" required></label><br>
-    <label>Outcome: 
-      <select name="outcome" required>
-        <option value="Win">Win</option>
-        <option value="Loss">Loss</option>
-        <option value="BE">BE</option>
-      </select>
-    </label><br>
-    <label>Notes: <textarea name="notes"></textarea></label><br>
-    <label>Screenshots: <input type="file" name="screenshots" multiple accept="image/*"></label><br>
-    <button type="submit">Save Trade</button>
-  </form>
-  <a href="index.html">Back to View Trades</a>
+   <html lang="en">
+   <head>
+     <meta charset="UTF-8">
+     <title>Trading Diary - Add Trade</title>
+     <link rel="stylesheet" href="styles.css">
+   </head>
+   <body>
+     <h1>Add New Trade</h1>
+     <form id="tradeForm">
+       <label>Date: <input type="date" name="date" required></label><br>
+       <label>Symbol: <input type="text" name="symbol" required></label><br>
+       <label>Pattern Name: <input type="text" name="patternName" required></label><br>
+       <label>Pattern Condition: <textarea name="patternCondition" required></textarea></label><br>
+       <label>Strategy: 
+         <select name="strategy" required>
+           <option value="Breakout">Breakout</option>
+           <option value="Pullback">Pullback</option>
+           <option value="Reversal">Reversal</option>
+           <option value="Momentum">Momentum</option>
+           <option value="Scalping">Scalping</option>
+           <option value="Swing Trading">Swing Trading</option>
+           <option value="Position Trading">Position Trading</option>
+         </select>
+       </label><br>
+       <label>Entry: <input type="number" name="entry" step="0.01" required></label><br>
+       <label>Stop Loss: <input type="number" name="stopLoss" step="0.01" required></label><br>
+       <label>Target: <input type="number" name="target" step="0.01" required></label><br>
+       <label>Exit: <input type="number" name="exit" step="0.01" required></label><br>
+       <label>Outcome: 
+         <select name="outcome" required>
+           <option value="Win">Win</option>
+           <option value="Loss">Loss</option>
+           <option value="BE">BE</option>
+         </select>
+       </label><br>
+       <label>Notes: <textarea name="notes"></textarea></label><br>
+       <label>Screenshots: <input type="file" name="screenshots" multiple accept="image/*"></label><br>
+       <button type="submit">Save Trade</button>
+     </form>
+     <a href="index.html">Back to View Trades</a>
 
-  <script>
-    const form = document.getElementById('tradeForm');
-    form.onsubmit = async (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-      const response = await fetch('/.netlify/functions/add-trade', {
-        method: 'POST',
-        body: formData,
-      });
-      if (response.ok) {
-        alert('Trade added!');
-        window.location.href = 'index.html';
-      } else {
-        alert('Error adding trade');
-      }
-    };
-  </script>
-</body>
-</html>
+     <script>
+       const form = document.getElementById('tradeForm');
+       form.onsubmit = async (e) => {
+         e.preventDefault();
+         const idToken = localStorage.getItem('id_token');
+         const clientId = localStorage.getItem('client_id');
+         if (!idToken || !clientId) {
+           window.location.href = 'auth.html';
+           return;
+         }
+         const formData = new FormData(form);
+         const response = await fetch('/.netlify/functions/add-trade', {
+           method: 'POST',
+           headers: {
+             'Authorization': `Bearer ${idToken}`,
+             'x-client-id': clientId,
+           },
+           body: formData,
+         });
+         if (response.ok) {
+           alert('Trade added!');
+           window.location.href = 'index.html';
+         } else {
+           alert('Error adding trade');
+         }
+       };
+     </script>
+   </body>
+   </html>
