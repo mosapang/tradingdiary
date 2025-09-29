@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trading Diary - View Trades</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Trade History</h1>
+  <a href="add.html">Add New Trade</a> | <a href="auth.html">Logout</a>
+  <table id="tradesTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Symbol</th>
+        <th>Pattern</th>
+        <th>Strategy</th>
+        <th>Outcome</th>
+        <th>Notes</th>
+        <th>Screenshots</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div id="detailView" style="display:none;">
+    <h2>Trade Details</h2>
+    <div id="detailContent"></div>
+    <button onclick="closeDetail()">Close</button>
+  </div>
+
+  <script>
+    async function loadTrades() {
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        window.location.href = 'auth.html';
+        return;
+      }
+      const response = await fetch('/.netlify/functions/get-trades', {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      });
+      if (response.status === 401) {
+        window.location.href = 'auth.html';
+        return;
+      }
+      const trades = await response.json();
+      const tbody = document.querySelector('#tradesTable tbody');
+      tbody.innerHTML = '';
+      trades.forEach(trade => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${trade.Date}</td>
+          <td>${trade.Symbol}</td>
+          <td>${trade.PatternName}</td>
+          <td>${trade.Strategy}</td>
+          <td>${trade.Outcome}</td>
+          <td>${trade.Notes}</td>
+          <td>${trade.screenshots.map(link => `<img src="${link}" alt="Thumbnail" width="50">`).join(' ')}</td>
+        `;
+        row.onclick = () => showDetail(trade);
+        tbody.appendChild(row);
+      });
+    }
+
+    function showDetail(trade) {
+      const content = document.getElementById('detailContent');
+      content.innerHTML = `
+        <p><strong>Date:</strong> ${trade.Date}</p>
+        <p><strong>Symbol:</strong> ${trade.Symbol}</p>
+        <p><strong>Pattern Name:</strong> ${trade.PatternName}</p>
+        <p><strong>Pattern Condition:</strong> ${trade.PatternCondition}</p>
+        <p><strong>Strategy:</strong> ${trade.Strategy}</p>
+        <p><strong>Entry:</strong> ${trade.Entry}</p>
+        <p><strong>Stop Loss:</strong> ${trade.StopLoss}</p>
+        <p><strong>Target:</strong> ${trade.Target}</p>
+        <p><strong>Exit:</strong> ${trade.Exit}</p>
+        <p><strong>Outcome:</strong> ${trade.Outcome}</p>
+        <p><strong>Notes:</strong> ${trade.Notes}</p>
+        <h3>Screenshots</h3>
+        <div class="gallery">
+          ${trade.screenshots.map(link => `<img src="${link}" alt="Screenshot" width="300">`).join('')}
+        </div>
+      `;
+      document.getElementById('detailView').style.display = 'block';
+    }
+
+    function closeDetail() {
+      document.getElementById('detailView').style.display = 'none';
+    }
+
+    window.onload = loadTrades;
+  </script>
+</body>
+</html>

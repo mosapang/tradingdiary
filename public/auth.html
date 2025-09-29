@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trading Diary - Login</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <h1>Trading Diary - Login</h1>
+  <form id="authForm">
+    <label>Google Client ID: <input type="text" id="clientId" required></label><br>
+    <label>Google API Key: <input type="text" id="apiKey" required></label><br>
+    <div id="g_id_onload"
+         data-client_id=""
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+  </form>
+  <script>
+    let clientId, apiKey;
+
+    function handleCredentialResponse(response) {
+      localStorage.setItem('access_token', response.credential);
+      localStorage.setItem('client_id', clientId);
+      localStorage.setItem('api_key', apiKey);
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('authForm').onsubmit = (e) => {
+      e.preventDefault();
+      clientId = document.getElementById('clientId').value;
+      apiKey = document.getElementById('apiKey').value;
+      document.querySelector('#g_id_onload').setAttribute('data-client_id', clientId);
+      // Trigger Google Sign-In button programmatically (if needed)
+      document.querySelector('.g_id_signin').click();
+    };
+  </script>
+</body>
+</html>

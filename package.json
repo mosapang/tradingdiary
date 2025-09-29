@@ -1,0 +1,9 @@
+{
+  "name": "trading-diary",
+  "version": "1.0.0",
+  "dependencies": {
+    "googleapis": "^128.0.0",
+    "uuid": "^10.0.0",
+    "busboy": "^1.6.0"
+  }
+}
